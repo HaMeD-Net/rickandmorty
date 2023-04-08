@@ -15,6 +15,8 @@ import {
   Box,
 } from "@mui/material";
 import { fetchData } from "../helper/fetchData";
+import Header from "./header";
+import { useSelector } from "react-redux";
 
 interface ICharacters {
   characters: {
@@ -23,35 +25,15 @@ interface ICharacters {
 }
 
 const CharacterList = () => {
-  const [apiData, setApiData] = useState<any>();
-  const [characters, setCharacters] = useState();
+  // const [apiData, setApiData] = useState<any>();
+  const [charactersSection, setCharactersSection] = useState();
+  const characters = useSelector((state: any) => state.RickMortyReducer.data);
 
   useEffect(() => {
-    fetchData(
-      "https://rickandmortyapi.com/graphql",
-      JSON.stringify({
-        query: `{
-        characters {
-          results {
-            name
-            image
-            id
-          }
-        }
-      }`,
-      })
-    )
-      .then((res) => {
-        console.log(res);
-        setApiData(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
-  useEffect(() => {
-    console.log("apiData", apiData);
+    console.log("characters", characters);
 
-    const fetchResult = apiData?.characters.results.map(
-      (item: { name: string; image: string }) => {
+    const fetchResult = characters?.map(
+      (item: { name: string; image: string; id: number }) => {
         return (
           <Grid
             item
@@ -63,11 +45,12 @@ const CharacterList = () => {
             justifyContent={"center"}
             alignItems={"center"}
             spacing={3}
+            key={item.id}
           >
             <Box
               sx={{
-                width: 300,
-                height: 300,
+                width: { xs: "100%", sm: 300 },
+                height: { xs: "100%", sm: 300 },
                 backgroundColor: "primary.dark",
                 "&:hover": {
                   backgroundColor: "primary.main",
@@ -80,11 +63,25 @@ const CharacterList = () => {
               <Avatar
                 alt={item.name}
                 src={item.image}
-                sx={{ width: 250, height: 250, margin: "auto" }}
+                sx={{
+                  width: { xs: "50%", sm: 250 },
+                  height: { xs: "70%", sm: 250 },
+                  margin: "auto",
+                }}
               >
                 {item.image}
               </Avatar>
-              <Typography mt={2} variant="h5">
+              <Typography
+                mt={2}
+                sx={{
+                  fontSize: {
+                    lg: 20,
+                    md: 20,
+                    sm: 15,
+                    xs: 10,
+                  },
+                }}
+              >
                 {item.name}
               </Typography>
             </Box>
@@ -92,15 +89,17 @@ const CharacterList = () => {
         );
       }
     );
-    setCharacters(fetchResult);
+    setCharactersSection(fetchResult);
     console.log("fetchResult", fetchResult);
-  }, [apiData]);
+  }, [characters]);
   return (
-    <div style={{ padding: 10 }}>
-      <Container maxWidth="xl">
-        <Grid container spacing={5}>
-          {characters}
-          {/* <Grid item>formItem1</Grid>
+    <>
+      <Header />
+      <div style={{ padding: 10 }}>
+        <Container maxWidth="xl">
+          <Grid container spacing={5}>
+            {charactersSection}
+            {/* <Grid item>formItem1</Grid>
           <Grid item>formItem2</Grid>
           <Grid item>formItem3</Grid>
           <Grid item>formItem4</Grid>
@@ -117,9 +116,10 @@ const CharacterList = () => {
           <Grid item>formItem15</Grid>
           <Grid item>formItem16</Grid>
           <Grid item>formItem17</Grid> */}
-        </Grid>
-      </Container>
-    </div>
+          </Grid>
+        </Container>
+      </div>
+    </>
     // <div className={classes.root}>
     //   <List className={classes.list}>
     //     {characters.map((character) => (
