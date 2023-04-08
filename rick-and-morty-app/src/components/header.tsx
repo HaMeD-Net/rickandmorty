@@ -1,11 +1,16 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { fetchData } from "../helper/fetchData";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navItems = ["ReadMe"];
   const handleButtonClick = () => {
+    dispatch({
+      type: "LOADING",
+      payload: true,
+    });
+
     fetchData(
       "https://rickandmortyapi.com/graphql",
       JSON.stringify({
@@ -28,7 +33,13 @@ const Header = () => {
           payload: res.characters.results,
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => {
+        dispatch({
+          type: "LOADING",
+          payload: false,
+        });
+      });
   };
   return (
     <Box sx={{ display: "flex" }}>
